@@ -7,7 +7,7 @@ import (
 )
 
 type GdprSDK struct {
-	gdprServiceServer *service.GRPCServer
+	gdprServiceServer *service.GDPRServiceServer
 }
 
 func NewGdprSDK() *GdprSDK {
