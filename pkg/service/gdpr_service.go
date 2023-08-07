@@ -22,13 +22,14 @@ import (
 	"math/rand"
 	"time"
 
+	pb "github.com/marselsampe/accelbyte-gdpr-sdk"
 	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
 )
 
 type GDPRServiceServer struct {
 	pb.UnimplementedGDPRServer
-	DataGenerationHandler func() error
-	DataDeletionHandler   func() error
+	DataGenerationHandler gdprsdk.DataGenerationHandler
+	DataDeletionHandler   gdprsdk.DataDeletionHandler
 }
 
 func NewGDPRServiceServer() *GDPRServiceServer {

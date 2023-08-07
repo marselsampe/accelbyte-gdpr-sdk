@@ -26,17 +26,20 @@ type GdprSDK struct {
 	gdprServiceServer *service.GDPRServiceServer
 }
 
+type DataGenerationHandler func() error
+type DataDeletionHandler func() error
+
 func NewGdprSDK() *GdprSDK {
 	return &GdprSDK{
 		gdprServiceServer: service.NewGDPRServiceServer(),
 	}
 }
 
-func (sdk GdprSDK) SetDataGenerationHandler(handler func() error) {
+func (sdk GdprSDK) SetDataGenerationHandler(handler DataGenerationHandler) {
 	sdk.gdprServiceServer.DataGenerationHandler = handler
 }
 
-func (sdk GdprSDK) SetDataDeletionHandler(handler func() error) {
+func (sdk GdprSDK) SetDataDeletionHandler(handler DataDeletionHandler) {
 	sdk.gdprServiceServer.DataDeletionHandler = handler
 }
 
