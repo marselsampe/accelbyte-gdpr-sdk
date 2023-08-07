@@ -43,15 +43,15 @@ func NewGDPRServiceServer() *GDPRServiceServer {
 func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGenerationRequest) (*pb.DataGenerationResponse, error) {
 	logrus.Info("Invoke DataGeneration")
 
-	if req.User == nil || req.User.Namespace == "" || req.User.UserId == "" || req.UploadUrl == "" {
+	if req.Namespace == "" || req.UserId == "" || req.UploadUrl == "" {
 		return &pb.DataGenerationResponse{
 			Success: false,
 			Message: "required payload is empty",
 		}, nil
 	}
 
-	namespace := req.User.Namespace
-	userID := req.User.UserId
+	namespace := req.Namespace
+	userID := req.UserId
 
 	if s.DataGenerationHandler != nil {
 		resultBytes, err := s.DataGenerationHandler(namespace, userID)
@@ -96,15 +96,15 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 func (s *GDPRServiceServer) DataDeletion(_ context.Context, req *pb.DataDeletionRequest) (*pb.DataDeletionResponse, error) {
 	logrus.Info("Invoke DataDeletion")
 
-	if req.User == nil || req.User.Namespace == "" || req.User.UserId == "" {
+	if req.Namespace == "" || req.UserId == "" {
 		return &pb.DataDeletionResponse{
 			Success: false,
 			Message: "required payload is empty",
 		}, nil
 	}
 
-	namespace := req.User.Namespace
-	userID := req.User.UserId
+	namespace := req.Namespace
+	userID := req.UserId
 
 	if s.DataDeletionHandler != nil {
 		err := s.DataDeletionHandler(namespace, userID)

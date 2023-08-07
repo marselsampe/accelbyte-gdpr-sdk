@@ -24,16 +24,10 @@ service GDPR {
 
 }
 
-message User {
+message DataGenerationRequest {
   string namespace = 1; // namespace of user
   string userId = 2; // user id
-}
-
-message DataGenerationRequest {
-  // user that need to process
-  User user = 1;
-  // upload url that used to upload the generated file into GDPR Service storage
-  string uploadUrl = 2;
+  string uploadUrl = 3; // upload url that used to upload the generated file into GDPR Service storage
 }
 
 message DataGenerationResponse {
@@ -42,8 +36,8 @@ message DataGenerationResponse {
 }
 
 message DataDeletionRequest {
-  // user that need to process
-  User user = 1;
+  string namespace = 1; // namespace of user
+  string userId = 2; // user id
 }
 
 message DataDeletionResponse {
