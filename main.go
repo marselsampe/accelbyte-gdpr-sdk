@@ -1,8 +1,8 @@
 package gdprsdk
 
 import (
-	pb "github.com/AccelByte/accelbyte-gdpr-sdk/pkg/pb"
-	"github.com/AccelByte/accelbyte-gdpr-sdk/pkg/service"
+	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
+	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/service"
 	"google.golang.org/grpc"
 )
 

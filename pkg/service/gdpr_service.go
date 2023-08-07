@@ -10,7 +10,7 @@ import (
 	"math/rand"
 	"time"
 
-	pb "github.com/AccelByte/accelbyte-gdpr-sdk/pkg/pb"
+	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
 )
 
 type GRPCServer struct {
