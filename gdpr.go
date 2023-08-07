@@ -17,6 +17,7 @@
 package gdprsdk
 
 import (
+	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/constant"
 	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
 	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/service"
 	"google.golang.org/grpc"
@@ -26,20 +27,17 @@ type GdprSDK struct {
 	gdprServiceServer *service.GDPRServiceServer
 }
 
-type DataGenerationHandler func() error
-type DataDeletionHandler func() error
-
 func NewGdprSDK() *GdprSDK {
 	return &GdprSDK{
 		gdprServiceServer: service.NewGDPRServiceServer(),
 	}
 }
 
-func (sdk GdprSDK) SetDataGenerationHandler(handler DataGenerationHandler) {
+func (sdk GdprSDK) SetDataGenerationHandler(handler constant.DataGenerationHandler) {
 	sdk.gdprServiceServer.DataGenerationHandler = handler
 }
 
-func (sdk GdprSDK) SetDataDeletionHandler(handler DataDeletionHandler) {
+func (sdk GdprSDK) SetDataDeletionHandler(handler constant.DataDeletionHandler) {
 	sdk.gdprServiceServer.DataDeletionHandler = handler
 }
 
