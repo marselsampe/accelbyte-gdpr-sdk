@@ -25,23 +25,8 @@ import (
 	"os"
 	"path/filepath"
 
-	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
 	"github.com/sirupsen/logrus"
 )
-
-// StringToMessage will return message type
-func StringToMessage(str string) *pb.Message {
-	return &pb.Message{
-		Message: str,
-	}
-}
-
-// StringToMessages will convert string to messages type
-func StringToMessages(str string) []*pb.Message {
-	return []*pb.Message{
-		StringToMessage(str),
-	}
-}
 
 func CreateTempFile(fileName string, bytes []byte) (*os.File, error) {
 	logrus.Debugf("[CreateTempFile] Creating file [%s]...", fileName)

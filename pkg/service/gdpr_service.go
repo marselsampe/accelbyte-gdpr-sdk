@@ -45,8 +45,8 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 
 	if req.User == nil || req.User.Namespace == "" || req.User.UserId == "" || req.UploadUrl == "" {
 		return &pb.DataGenerationResponse{
-			Success:  false,
-			Messages: StringToMessages("required payload is empty"),
+			Success: false,
+			Message: "required payload is empty",
 		}, nil
 	}
 
@@ -58,8 +58,8 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed executing DataGenerationHandler. Error: %s", err)
 			return &pb.DataGenerationResponse{
-				Success:  false,
-				Messages: StringToMessages(err.Error()),
+				Success: false,
+				Message: err.Error(),
 			}, nil
 		}
 		if resultBytes == nil {
@@ -74,8 +74,8 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed creating file. Error: %s", err)
 			return &pb.DataGenerationResponse{
-				Success:  false,
-				Messages: StringToMessages("Failed creating file. Error: " + err.Error()),
+				Success: false,
+				Message: "Failed creating file. Error: " + err.Error(),
 			}, nil
 		}
 
@@ -84,8 +84,8 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed uploading file. Error: %s", err)
 			return &pb.DataGenerationResponse{
-				Success:  false,
-				Messages: StringToMessages("Failed uploading file. Error: " + err.Error()),
+				Success: false,
+				Message: "Failed uploading file. Error: " + err.Error(),
 			}, nil
 		}
 	}
@@ -98,8 +98,8 @@ func (s *GDPRServiceServer) DataDeletion(_ context.Context, req *pb.DataDeletion
 
 	if req.User == nil || req.User.Namespace == "" || req.User.UserId == "" {
 		return &pb.DataDeletionResponse{
-			Success:  false,
-			Messages: StringToMessages("required payload is empty"),
+			Success: false,
+			Message: "required payload is empty",
 		}, nil
 	}
 
@@ -111,8 +111,8 @@ func (s *GDPRServiceServer) DataDeletion(_ context.Context, req *pb.DataDeletion
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed executing DataDeletionHandler. Error: %s", err)
 			return &pb.DataDeletionResponse{
-				Success:  false,
-				Messages: StringToMessages(err.Error()),
+				Success: false,
+				Message: err.Error(),
 			}, nil
 		}
 	}
