@@ -14,7 +14,16 @@
  *
  */
 
-package constant
+package object
 
 type DataGenerationHandler func() error
 type DataDeletionHandler func() error
+
+type Payload struct {
+	users []UserPayload
+}
+
+type UserPayload struct {
+	Namespace string
+	UserID    string
+}
