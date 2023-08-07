@@ -23,9 +23,9 @@ const _ = grpc.SupportPackageIsVersion7
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GDPRClient interface {
 	// *
-	// Personal Data Generation.
+	// Data Generation.
 	// The generated data will be uploaded into GDPR storage.
-	PersonalDataGeneration(ctx context.Context, in *PersonalDataRequest, opts ...grpc.CallOption) (*PersonalDataResponse, error)
+	DataGeneration(ctx context.Context, in *DataGenerationRequest, opts ...grpc.CallOption) (*DataGenerationResponse, error)
 	// *
 	// Data Deletion.
 	DataDeletion(ctx context.Context, in *DataDeletionRequest, opts ...grpc.CallOption) (*DataDeletionResponse, error)
@@ -39,9 +39,9 @@ func NewGDPRClient(cc grpc.ClientConnInterface) GDPRClient {
 	return &gDPRClient{cc}
 }
 
-func (c *gDPRClient) PersonalDataGeneration(ctx context.Context, in *PersonalDataRequest, opts ...grpc.CallOption) (*PersonalDataResponse, error) {
-	out := new(PersonalDataResponse)
-	err := c.cc.Invoke(ctx, "/accelbyte.gdpr.registered.v1.GDPR/PersonalDataGeneration", in, out, opts...)
+func (c *gDPRClient) DataGeneration(ctx context.Context, in *DataGenerationRequest, opts ...grpc.CallOption) (*DataGenerationResponse, error) {
+	out := new(DataGenerationResponse)
+	err := c.cc.Invoke(ctx, "/accelbyte.gdpr.registered.v1.GDPR/DataGeneration", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -62,9 +62,9 @@ func (c *gDPRClient) DataDeletion(ctx context.Context, in *DataDeletionRequest, 
 // for forward compatibility
 type GDPRServer interface {
 	// *
-	// Personal Data Generation.
+	// Data Generation.
 	// The generated data will be uploaded into GDPR storage.
-	PersonalDataGeneration(context.Context, *PersonalDataRequest) (*PersonalDataResponse, error)
+	DataGeneration(context.Context, *DataGenerationRequest) (*DataGenerationResponse, error)
 	// *
 	// Data Deletion.
 	DataDeletion(context.Context, *DataDeletionRequest) (*DataDeletionResponse, error)
@@ -75,8 +75,8 @@ type GDPRServer interface {
 type UnimplementedGDPRServer struct {
 }
 
-func (UnimplementedGDPRServer) PersonalDataGeneration(context.Context, *PersonalDataRequest) (*PersonalDataResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method PersonalDataGeneration not implemented")
+func (UnimplementedGDPRServer) DataGeneration(context.Context, *DataGenerationRequest) (*DataGenerationResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DataGeneration not implemented")
 }
 func (UnimplementedGDPRServer) DataDeletion(context.Context, *DataDeletionRequest) (*DataDeletionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DataDeletion not implemented")
@@ -94,20 +94,20 @@ func RegisterGDPRServer(s grpc.ServiceRegistrar, srv GDPRServer) {
 	s.RegisterService(&GDPR_ServiceDesc, srv)
 }
 
-func _GDPR_PersonalDataGeneration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PersonalDataRequest)
+func _GDPR_DataGeneration_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DataGenerationRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GDPRServer).PersonalDataGeneration(ctx, in)
+		return srv.(GDPRServer).DataGeneration(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/accelbyte.gdpr.registered.v1.GDPR/PersonalDataGeneration",
+		FullMethod: "/accelbyte.gdpr.registered.v1.GDPR/DataGeneration",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GDPRServer).PersonalDataGeneration(ctx, req.(*PersonalDataRequest))
+		return srv.(GDPRServer).DataGeneration(ctx, req.(*DataGenerationRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -138,8 +138,8 @@ var GDPR_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GDPRServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "PersonalDataGeneration",
-			Handler:    _GDPR_PersonalDataGeneration_Handler,
+			MethodName: "DataGeneration",
+			Handler:    _GDPR_DataGeneration_Handler,
 		},
 		{
 			MethodName: "DataDeletion",

@@ -12,10 +12,10 @@ option java_outer_classname = "gdprProto";
 service GDPR {
 
   /**
-   Personal Data Generation.
+   Data Generation.
    The generated data will be uploaded into GDPR storage.
    */
-  rpc PersonalDataGeneration(PersonalDataRequest) returns (PersonalDataResponse) {};
+  rpc DataGeneration(DataGenerationRequest) returns (DataGenerationResponse) {};
 
   /**
    Data Deletion.
@@ -24,10 +24,10 @@ service GDPR {
 
 }
 
-message PersonalDataRequest {
+message DataGenerationRequest {
 }
 
-message PersonalDataResponse {
+message DataGenerationResponse {
 }
 
 message DataDeletionRequest {
