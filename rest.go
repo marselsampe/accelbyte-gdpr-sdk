@@ -14,7 +14,11 @@
  *
  */
 
-package object
+package gdprsdk
 
-type DataGenerationHandler func(namespace, userID string) ([]byte, error)
-type DataDeletionHandler func(namespace, userID string) error
+type RestSDK struct {
+}
+
+func NewRestSDK() *RestSDK {
+	return &RestSDK{}
+}

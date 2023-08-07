@@ -24,7 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type GDPRClient interface {
 	// *
 	// Data Generation.
-	// The generated data will be uploaded into GDPR storage.
+	// The generated data will be uploaded into GDPR Service storage.
 	DataGeneration(ctx context.Context, in *DataGenerationRequest, opts ...grpc.CallOption) (*DataGenerationResponse, error)
 	// *
 	// Data Deletion.
@@ -63,7 +63,7 @@ func (c *gDPRClient) DataDeletion(ctx context.Context, in *DataDeletionRequest, 
 type GDPRServer interface {
 	// *
 	// Data Generation.
-	// The generated data will be uploaded into GDPR storage.
+	// The generated data will be uploaded into GDPR Service storage.
 	DataGeneration(context.Context, *DataGenerationRequest) (*DataGenerationResponse, error)
 	// *
 	// Data Deletion.

@@ -13,7 +13,7 @@ service GDPR {
 
   /**
    Data Generation.
-   The generated data will be uploaded into GDPR storage.
+   The generated data will be uploaded into GDPR Service storage.
    */
   rpc DataGeneration(DataGenerationRequest) returns (DataGenerationResponse) {};
 
@@ -24,14 +24,33 @@ service GDPR {
 
 }
 
+message Message {
+  string message = 1;
+}
+
+message User {
+  string namespace = 1; // namespace of user
+  string userId = 2; // user id
+}
+
 message DataGenerationRequest {
+  // user that need to process
+  User user = 1;
+  // upload url that used to upload the generated file into GDPR Service storage
+  string uploadUrl = 2;
 }
 
 message DataGenerationResponse {
+  bool success = 1; // indicate data generation was success
+  repeated Message messages = 3; // contains messages from data generation process
 }
 
 message DataDeletionRequest {
+  // user that need to process
+  User user = 1;
 }
 
 message DataDeletionResponse {
+  bool success = 1; // indicate data deletion was success
+  repeated Message messages = 3; // contains messages from data deletion process
 }

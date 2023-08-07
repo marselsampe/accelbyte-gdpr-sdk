@@ -18,12 +18,14 @@ package service
 
 import (
 	"context"
-	"github.com/sirupsen/logrus"
+	"fmt"
 	"math/rand"
+	"os"
 	"time"
 
 	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/object"
 	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
+	"github.com/sirupsen/logrus"
 )
 
 type GDPRServiceServer struct {
@@ -38,24 +40,82 @@ func NewGDPRServiceServer() *GDPRServiceServer {
 	return &GDPRServiceServer{}
 }
 
-func (s *GDPRServiceServer) DataGeneration(_ context.Context, req *pb.DataGenerationRequest) (*pb.DataGenerationResponse, error) {
+func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGenerationRequest) (*pb.DataGenerationResponse, error) {
 	logrus.Info("Invoke DataGeneration")
+
+	if req.User == nil || req.User.Namespace == "" || req.User.UserId == "" || req.UploadUrl == "" {
+		return &pb.DataGenerationResponse{
+			Success:  false,
+			Messages: StringToMessages("required payload is empty"),
+		}, nil
+	}
+
+	namespace := req.User.Namespace
+	userID := req.User.UserId
+
 	if s.DataGenerationHandler != nil {
-		err := s.DataGenerationHandler()
+		resultBytes, err := s.DataGenerationHandler(namespace, userID)
 		if err != nil {
-			// TODO: handle error
+			logrus.Errorf("[DataGeneration worker] Failed executing DataGenerationHandler. Error: %s", err)
+			return &pb.DataGenerationResponse{
+				Success:  false,
+				Messages: StringToMessages(err.Error()),
+			}, nil
+		}
+		if resultBytes == nil {
+			return &pb.DataGenerationResponse{Success: true}, nil
+		}
+
+		// save result into file
+		tempFile, err := CreateTempFile(fmt.Sprintf("%s-%s", namespace, userID), resultBytes)
+		if tempFile != nil {
+			defer os.Remove(tempFile.Name())
+		}
+		if err != nil {
+			logrus.Errorf("[DataGeneration worker] Failed creating file. Error: %s", err)
+			return &pb.DataGenerationResponse{
+				Success:  false,
+				Messages: StringToMessages("Failed creating file. Error: " + err.Error()),
+			}, nil
+		}
+
+		// upload file into storage
+		err = UploadFile(ctx, req.UploadUrl, tempFile.Name())
+		if err != nil {
+			logrus.Errorf("[DataGeneration worker] Failed uploading file. Error: %s", err)
+			return &pb.DataGenerationResponse{
+				Success:  false,
+				Messages: StringToMessages("Failed uploading file. Error: " + err.Error()),
+			}, nil
 		}
 	}
-	return &pb.DataGenerationResponse{}, nil
+
+	return &pb.DataGenerationResponse{Success: true}, nil
 }
 
 func (s *GDPRServiceServer) DataDeletion(_ context.Context, req *pb.DataDeletionRequest) (*pb.DataDeletionResponse, error) {
 	logrus.Info("Invoke DataDeletion")
+
+	if req.User == nil || req.User.Namespace == "" || req.User.UserId == "" {
+		return &pb.DataDeletionResponse{
+			Success:  false,
+			Messages: StringToMessages("required payload is empty"),
+		}, nil
+	}
+
+	namespace := req.User.Namespace
+	userID := req.User.UserId
+
 	if s.DataDeletionHandler != nil {
-		err := s.DataDeletionHandler()
+		err := s.DataDeletionHandler(namespace, userID)
 		if err != nil {
-			// TODO: handle error
+			logrus.Errorf("[DataGeneration worker] Failed executing DataDeletionHandler. Error: %s", err)
+			return &pb.DataDeletionResponse{
+				Success:  false,
+				Messages: StringToMessages(err.Error()),
+			}, nil
 		}
 	}
-	return &pb.DataDeletionResponse{}, nil
+
+	return &pb.DataDeletionResponse{Success: true}, nil
 }

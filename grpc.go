@@ -23,24 +23,24 @@ import (
 	"google.golang.org/grpc"
 )
 
-type GdprSDK struct {
-	gdprServiceServer *service.GDPRServiceServer
-}
-
-func NewGdprSDK() *GdprSDK {
-	return &GdprSDK{
+func NewGrpcSDK() *GrpcSDK {
+	return &GrpcSDK{
 		gdprServiceServer: service.NewGDPRServiceServer(),
 	}
 }
 
-func (sdk GdprSDK) SetDataGenerationHandler(handler object.DataGenerationHandler) {
+type GrpcSDK struct {
+	gdprServiceServer *service.GDPRServiceServer
+}
+
+func (sdk GrpcSDK) RegisterGRPC(server *grpc.Server) {
+	pb.RegisterGDPRServer(server, sdk.gdprServiceServer)
+}
+
+func (sdk GrpcSDK) SetDataGenerationHandler(handler object.DataGenerationHandler) {
 	sdk.gdprServiceServer.DataGenerationHandler = handler
 }
 
-func (sdk GdprSDK) SetDataDeletionHandler(handler object.DataDeletionHandler) {
+func (sdk GrpcSDK) SetDataDeletionHandler(handler object.DataDeletionHandler) {
 	sdk.gdprServiceServer.DataDeletionHandler = handler
-}
-
-func (sdk GdprSDK) RegisterGRPC(server *grpc.Server) {
-	pb.RegisterGDPRServer(server, sdk.gdprServiceServer)
 }
