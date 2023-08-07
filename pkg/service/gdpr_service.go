@@ -13,22 +13,22 @@ import (
 	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
 )
 
-type GRPCServer struct {
+type GDPRServiceServer struct {
 	pb.UnimplementedGDPRServer
 }
 
-func NewGDPRServiceServer() *GRPCServer {
+func NewGDPRServiceServer() *GDPRServiceServer {
 	rand.Seed(time.Now().Unix())
 
-	return &GRPCServer{}
+	return &GDPRServiceServer{}
 }
 
-func (s *GRPCServer) PersonalDataGeneration(_ context.Context, req *pb.PersonalDataRequest) (*pb.PersonalDataResponse, error) {
+func (s *GDPRServiceServer) PersonalDataGeneration(_ context.Context, req *pb.PersonalDataRequest) (*pb.PersonalDataResponse, error) {
 	logrus.Info("Invoke PersonalDataGeneration")
-	return nil, nil
+	return &pb.PersonalDataResponse{}, nil
 }
 
-func (s *GRPCServer) DataDeletion(_ context.Context, req *pb.DataDeletionRequest) (*pb.DataDeletionResponse, error) {
+func (s *GDPRServiceServer) DataDeletion(_ context.Context, req *pb.DataDeletionRequest) (*pb.DataDeletionResponse, error) {
 	logrus.Info("Invoke DataDeletion")
-	return nil, nil
+	return &pb.DataDeletionResponse{}, nil
 }

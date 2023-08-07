@@ -7,15 +7,15 @@ import (
 )
 
 type GdprSDK struct {
-	grpcServer *service.GRPCServer
+	gdprServiceServer *service.GRPCServer
 }
 
 func NewGdprSDK() *GdprSDK {
 	return &GdprSDK{
-		grpcServer: &service.GRPCServer{},
+		gdprServiceServer: service.NewGDPRServiceServer(),
 	}
 }
 
-func (sdk GdprSDK) RegisterGRPC(grpcServer *grpc.Server) {
-	pb.RegisterGDPRServer(grpcServer, sdk.grpcServer)
+func (sdk GdprSDK) RegisterGRPC(server *grpc.Server) {
+	pb.RegisterGDPRServer(server, sdk.gdprServiceServer)
 }
