@@ -17,7 +17,7 @@
 package gdprsdk
 
 import (
-	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/grpc"
+	gdprGrpc "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/grpc"
 	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/object"
 	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
 	"google.golang.org/grpc"
@@ -25,12 +25,12 @@ import (
 
 func NewGrpcSDK() *GrpcSDK {
 	return &GrpcSDK{
-		gdprServiceServer: service.NewGDPRServiceServer(),
+		gdprServiceServer: gdprGrpc.NewGDPRServiceServer(),
 	}
 }
 
 type GrpcSDK struct {
-	gdprServiceServer *service.GDPRServiceServer
+	gdprServiceServer *gdprGrpc.GDPRServiceServer
 }
 
 func (sdk GrpcSDK) RegisterGRPC(server *grpc.Server) {
