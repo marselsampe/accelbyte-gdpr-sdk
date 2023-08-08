@@ -14,7 +14,7 @@
  *
  */
 
-package service
+package utils
 
 import (
 	"context"

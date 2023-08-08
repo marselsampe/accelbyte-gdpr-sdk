@@ -14,7 +14,7 @@
  *
  */
 
-package service
+package grpc
 
 import (
 	"context"
@@ -25,6 +25,7 @@ import (
 
 	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/object"
 	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
+	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/utils"
 	"github.com/sirupsen/logrus"
 )
 
@@ -67,7 +68,7 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 		}
 
 		// save result into file
-		tempFile, err := CreateTempFile(fmt.Sprintf("%s-%s", namespace, userID), resultBytes)
+		tempFile, err := utils.CreateTempFile(fmt.Sprintf("%s-%s", namespace, userID), resultBytes)
 		if tempFile != nil {
 			defer os.Remove(tempFile.Name())
 		}
@@ -80,7 +81,7 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 		}
 
 		// upload file into storage
-		err = UploadFile(ctx, req.UploadUrl, tempFile.Name())
+		err = utils.UploadFile(ctx, req.UploadUrl, tempFile.Name())
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed uploading file. Error: %s", err)
 			return &pb.DataGenerationResponse{

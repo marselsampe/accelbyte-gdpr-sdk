@@ -17,9 +17,9 @@
 package gdprsdk
 
 import (
+	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/grpc"
 	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/object"
 	pb "github.com/marselsampe/accelbyte-gdpr-sdk/pkg/pb"
-	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/service"
 	"google.golang.org/grpc"
 )
 
