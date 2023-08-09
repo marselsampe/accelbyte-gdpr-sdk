@@ -57,5 +57,8 @@ Thumbs.db
 !.env.template
 !.env.example
 
+# Go vendor files
+vendor/
+
 # Go build output
 accelbyte-gdpr-sdk
