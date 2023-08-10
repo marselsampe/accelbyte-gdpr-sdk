@@ -60,7 +60,8 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 				Message: err.Error(),
 			}, nil
 		}
-		if resultBytes == nil {
+		if resultBytes == nil || utils.IsEmptyJson(resultBytes) {
+			logrus.Debugf("DataGeneration result is empty for namespace [%s] userId [%s]", namespace, userID)
 			return &pb.DataGenerationResponse{Success: true}, nil
 		}
 

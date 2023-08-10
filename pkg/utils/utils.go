@@ -27,6 +27,14 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
+func IsEmptyJson(data []byte) bool {
+	str := string(data)
+	if str == "" || str == "[]" || str == "{}" {
+		return false
+	}
+	return true
+}
+
 func UploadFile(ctx context.Context, uploadURL string, data []byte) error {
 	reader := bytes.NewReader(data)
 	req, err := http.NewRequestWithContext(ctx, http.MethodPut, uploadURL, reader)
