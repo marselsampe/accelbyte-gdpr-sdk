@@ -30,9 +30,9 @@ import (
 func IsEmptyJson(data []byte) bool {
 	str := string(data)
 	if str == "" || str == "[]" || str == "{}" {
-		return false
+		return true
 	}
-	return true
+	return false
 }
 
 func UploadFile(ctx context.Context, uploadURL string, data []byte) error {
