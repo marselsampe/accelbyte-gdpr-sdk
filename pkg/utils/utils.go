@@ -17,46 +17,24 @@
 package utils
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
-	"os"
-	"path/filepath"
 
 	"github.com/sirupsen/logrus"
 )
 
-func CreateTempFile(fileName string, bytes []byte) (*os.File, error) {
-	logrus.Debugf("[CreateTempFile] Creating file [%s]...", fileName)
-	tempFile, err := os.CreateTemp("", fileName)
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = tempFile.Write(bytes)
-	return tempFile, err
-}
-
-func UploadFile(ctx context.Context, uploadURL, filePath string) error {
-	file, err := os.Open(filepath.Clean(filePath))
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, uploadURL, file)
+func UploadFile(ctx context.Context, uploadURL string, data []byte) error {
+	reader := bytes.NewReader(data)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPut, uploadURL, reader)
 	if err != nil {
 		return err
 	}
 	req.Header.Add("Content-Type", "application/zip")
-
-	fi, err := file.Stat()
-	if err != nil {
-		return err
-	}
-	req.ContentLength = fi.Size()
+	req.ContentLength = reader.Size()
 
 	client := &http.Client{}
 	var resp *http.Response
@@ -66,7 +44,7 @@ func UploadFile(ctx context.Context, uploadURL, filePath string) error {
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		respBody, errRead := ioutil.ReadAll(resp.Body)
+		respBody, errRead := io.ReadAll(resp.Body)
 		if errRead != nil {
 			return errRead
 		}

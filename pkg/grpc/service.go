@@ -18,9 +18,7 @@ package grpc
 
 import (
 	"context"
-	"fmt"
 	"math/rand"
-	"os"
 	"time"
 
 	"github.com/marselsampe/accelbyte-gdpr-sdk/pkg/object"
@@ -42,8 +40,6 @@ func NewGDPRServiceServer() *GDPRServiceServer {
 }
 
 func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGenerationRequest) (*pb.DataGenerationResponse, error) {
-	logrus.Info("Invoke DataGeneration")
-
 	if req.Namespace == "" || req.UserId == "" || req.UploadUrl == "" {
 		return &pb.DataGenerationResponse{
 			Success: false,
@@ -55,6 +51,7 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 	userID := req.UserId
 
 	if s.DataGenerationHandler != nil {
+		logrus.Errorf("[DataGeneration worker] Failed executing DataGenerationHandler. Error: %s", err)
 		resultBytes, err := s.DataGenerationHandler(namespace, userID)
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed executing DataGenerationHandler. Error: %s", err)
@@ -67,21 +64,8 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 			return &pb.DataGenerationResponse{Success: true}, nil
 		}
 
-		// save result into file
-		tempFile, err := utils.CreateTempFile(fmt.Sprintf("%s-%s", namespace, userID), resultBytes)
-		if tempFile != nil {
-			defer os.Remove(tempFile.Name())
-		}
-		if err != nil {
-			logrus.Errorf("[DataGeneration worker] Failed creating file. Error: %s", err)
-			return &pb.DataGenerationResponse{
-				Success: false,
-				Message: "Failed creating file. Error: " + err.Error(),
-			}, nil
-		}
-
 		// upload file into storage
-		err = utils.UploadFile(ctx, req.UploadUrl, tempFile.Name())
+		err = utils.UploadFile(ctx, req.UploadUrl, resultBytes)
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed uploading file. Error: %s", err)
 			return &pb.DataGenerationResponse{
@@ -95,8 +79,6 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 }
 
 func (s *GDPRServiceServer) DataDeletion(_ context.Context, req *pb.DataDeletionRequest) (*pb.DataDeletionResponse, error) {
-	logrus.Info("Invoke DataDeletion")
-
 	if req.Namespace == "" || req.UserId == "" {
 		return &pb.DataDeletionResponse{
 			Success: false,
@@ -108,6 +90,7 @@ func (s *GDPRServiceServer) DataDeletion(_ context.Context, req *pb.DataDeletion
 	userID := req.UserId
 
 	if s.DataDeletionHandler != nil {
+		logrus.Infof("Invoke DataDeletion for namespace [%s] userId [%s]", namespace, userID)
 		err := s.DataDeletionHandler(namespace, userID)
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed executing DataDeletionHandler. Error: %s", err)
