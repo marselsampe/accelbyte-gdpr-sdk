@@ -51,7 +51,7 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 	userID := req.UserId
 
 	if s.DataGenerationHandler != nil {
-		logrus.Errorf("[DataGeneration worker] Failed executing DataGenerationHandler. Error: %s", err)
+		logrus.Infof("Invoke DataGeneration for namespace [%s] userId [%s]", namespace, userID)
 		resultBytes, err := s.DataGenerationHandler(namespace, userID)
 		if err != nil {
 			logrus.Errorf("[DataGeneration worker] Failed executing DataGenerationHandler. Error: %s", err)
