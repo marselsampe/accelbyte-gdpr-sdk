@@ -25,21 +25,13 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"os"
 
 	"github.com/sirupsen/logrus"
 )
 
 func CreateZipFile(namespace, userID string, data map[string][]byte) ([]byte, error) {
-	zipFile, err := os.Create(fmt.Sprintf("%s-%s.zip", namespace, userID))
-	if err != nil {
-		return nil, err
-	}
-	defer func() {
-		zipFile.Close()
-		_ = os.Remove(zipFile.Name())
-	}()
-	zipWriter := zip.NewWriter(zipFile)
+	buffer := new(bytes.Buffer)
+	zipWriter := zip.NewWriter(buffer)
 
 	var includedModules []string
 	for moduleID, moduleBytes := range data {
@@ -68,11 +60,11 @@ func CreateZipFile(namespace, userID string, data map[string][]byte) ([]byte, er
 		"modules":   includedModules,
 	})
 	if errMarshal != nil {
-		return nil, err
+		return nil, errMarshal
 	}
 	writer, errCreate := zipWriter.Create("summary.json")
 	if errCreate != nil {
-		return nil, err
+		return nil, errCreate
 	}
 	reader := bytes.NewReader(summaryBytes)
 	if _, errCopy := io.Copy(writer, reader); errCopy != nil {
@@ -81,12 +73,7 @@ func CreateZipFile(namespace, userID string, data map[string][]byte) ([]byte, er
 	zipWriter.Close()
 
 	// return zip file bytes
-	var zipBytes []byte
-	_, err = zipFile.Read(zipBytes)
-	if err != nil {
-		return nil, err
-	}
-	return zipBytes, nil
+	return buffer.Bytes(), nil
 }
 
 func UploadFile(ctx context.Context, uploadURL string, data []byte) error {
