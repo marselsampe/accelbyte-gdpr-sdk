@@ -51,24 +51,38 @@ func (s *GDPRServiceServer) DataGeneration(ctx context.Context, req *pb.DataGene
 	userID := req.UserId
 
 	if s.DataGenerationHandler != nil {
-		logrus.Infof("Invoke DataGeneration for namespace [%s] userId [%s]", namespace, userID)
-		resultBytes, err := s.DataGenerationHandler(namespace, userID)
+		logrus.Infof("[DataGeneration gRPC] Start execute for namespace [%s] userId [%s]", namespace, userID)
+		result, err := s.DataGenerationHandler(namespace, userID)
 		if err != nil {
-			logrus.Errorf("[DataGeneration worker] Failed executing DataGenerationHandler. Error: %s", err)
+			logrus.Errorf("[DataGeneration gRPC] Failed executing DataGenerationHandler. Error: %s", err)
 			return &pb.DataGenerationResponse{
 				Success: false,
 				Message: err.Error(),
 			}, nil
 		}
-		if resultBytes == nil || utils.IsEmptyJson(resultBytes) {
-			logrus.Debugf("DataGeneration result is empty for namespace [%s] userId [%s]", namespace, userID)
+		if result == nil || len(result.Data) == 0 {
+			logrus.Infof("[DataGeneration gRPC] Data result is empty for namespace [%s] userId [%s]", namespace, userID)
+			return &pb.DataGenerationResponse{Success: true}, nil
+		}
+
+		// create zip file
+		zipFileBytes, err := utils.CreateZipFile(namespace, userID, result.Data)
+		if err != nil {
+			logrus.Errorf("[DataGeneration gRPC] Failed creating zip file. Error: %s", err)
+			return &pb.DataGenerationResponse{
+				Success: false,
+				Message: err.Error(),
+			}, nil
+		}
+		if zipFileBytes == nil {
+			logrus.Infof("[DataGeneration gRPC] Data result is empty for namespace [%s] userId [%s]", namespace, userID)
 			return &pb.DataGenerationResponse{Success: true}, nil
 		}
 
 		// upload file into storage
-		err = utils.UploadFile(ctx, req.UploadUrl, resultBytes)
+		err = utils.UploadFile(ctx, req.UploadUrl, zipFileBytes)
 		if err != nil {
-			logrus.Errorf("[DataGeneration worker] Failed uploading file. Error: %s", err)
+			logrus.Errorf("[DataGeneration gRPC] Failed uploading file. Error: %s", err)
 			return &pb.DataGenerationResponse{
 				Success: false,
 				Message: "Failed uploading file. Error: " + err.Error(),
@@ -91,10 +105,10 @@ func (s *GDPRServiceServer) DataDeletion(_ context.Context, req *pb.DataDeletion
 	userID := req.UserId
 
 	if s.DataDeletionHandler != nil {
-		logrus.Infof("Invoke DataDeletion for namespace [%s] userId [%s]", namespace, userID)
+		logrus.Infof("[DataDeletion gRPC] Start execute for namespace [%s] userId [%s]", namespace, userID)
 		err := s.DataDeletionHandler(namespace, userID)
 		if err != nil {
-			logrus.Errorf("[DataGeneration worker] Failed executing DataDeletionHandler. Error: %s", err)
+			logrus.Errorf("[DataDeletion gRPC] Failed executing DataDeletionHandler. Error: %s", err)
 			return &pb.DataDeletionResponse{
 				Success: false,
 				Message: err.Error(),

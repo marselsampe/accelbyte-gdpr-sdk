@@ -17,22 +17,76 @@
 package utils
 
 import (
+	"archive/zip"
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 
 	"github.com/sirupsen/logrus"
 )
 
-func IsEmptyJson(data []byte) bool {
-	str := string(data)
-	if str == "" || str == "[]" || str == "{}" {
-		return true
+func CreateZipFile(namespace, userID string, data map[string][]byte) ([]byte, error) {
+	zipFile, err := os.Create(fmt.Sprintf("%s-%s.zip", namespace, userID))
+	if err != nil {
+		return nil, err
 	}
-	return false
+	defer func() {
+		zipFile.Close()
+		_ = os.Remove(zipFile.Name())
+	}()
+	zipWriter := zip.NewWriter(zipFile)
+
+	var includedModules []string
+	for moduleID, moduleBytes := range data {
+		if isEmptyJson(moduleBytes) {
+			continue
+		}
+		writer, errCreate := zipWriter.Create(moduleID)
+		if errCreate != nil {
+			return nil, errCreate
+		}
+		reader := bytes.NewReader(moduleBytes)
+		if _, errCopy := io.Copy(writer, reader); errCopy != nil {
+			return nil, errCopy
+		}
+		includedModules = append(includedModules, moduleID)
+	}
+
+	if len(includedModules) == 0 {
+		return nil, nil
+	}
+
+	// create summary file
+	summaryBytes, errMarshal := json.Marshal(map[string]interface{}{
+		"namespace": namespace,
+		"userId":    userID,
+		"modules":   includedModules,
+	})
+	if errMarshal != nil {
+		return nil, err
+	}
+	writer, errCreate := zipWriter.Create("summary.json")
+	if errCreate != nil {
+		return nil, err
+	}
+	reader := bytes.NewReader(summaryBytes)
+	if _, errCopy := io.Copy(writer, reader); errCopy != nil {
+		return nil, errCopy
+	}
+	zipWriter.Close()
+
+	// return zip file bytes
+	var zipBytes []byte
+	_, err = zipFile.Read(zipBytes)
+	if err != nil {
+		return nil, err
+	}
+	return zipBytes, nil
 }
 
 func UploadFile(ctx context.Context, uploadURL string, data []byte) error {
@@ -64,4 +118,15 @@ func UploadFile(ctx context.Context, uploadURL string, data []byte) error {
 	}
 
 	return nil
+}
+
+func isEmptyJson(bytes []byte) bool {
+	if bytes == nil {
+		return true
+	}
+	str := string(bytes)
+	if str == "" || str == "[]" || str == "{}" {
+		return true
+	}
+	return false
 }

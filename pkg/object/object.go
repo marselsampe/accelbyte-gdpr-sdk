@@ -16,5 +16,11 @@
 
 package object
 
-type DataGenerationHandler func(namespace, userID string) ([]byte, error)
+type DataGenerationHandler func(namespace, userID string) (*DataGenerationResult, error)
 type DataDeletionHandler func(namespace, userID string) error
+
+// DataGenerationResult contains result from DataGenerationHandler function
+type DataGenerationResult struct {
+	// TODO: description
+	Data map[string][]byte
+}
